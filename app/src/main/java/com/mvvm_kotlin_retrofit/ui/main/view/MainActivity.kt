@@ -62,7 +62,7 @@ class MainActivity : AppCompatActivity() {
     }
     private fun setupObservers() {
         if(viewModel.languageResponse.value==null){
-            viewModel.getLanguageList("com.twr").observe(this, Observer {
+            viewModel.getLanguageList("YOUR QUERY PARAMETER ").observe(this, Observer {
                 it?.let { resource ->
                     when (resource.status) {
                         Status.SUCCESS -> {
