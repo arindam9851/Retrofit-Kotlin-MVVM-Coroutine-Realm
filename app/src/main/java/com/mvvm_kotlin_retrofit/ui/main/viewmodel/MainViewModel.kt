@@ -2,16 +2,15 @@ package com.mvvm_kotlin_retrofit.ui.main.viewmodel
 
 import android.util.Log
 import android.widget.Toast
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.liveData
+import androidx.lifecycle.*
 import com.mvvm_kotlin_retrofit.data.model.Data
 import com.mvvm_kotlin_retrofit.data.model.LanguageListResponse
 import com.mvvm_kotlin_retrofit.data.repository.MainRepository
+import com.mvvm_kotlin_retrofit.db.RealmLiveData
+import com.mvvm_kotlin_retrofit.db.asLiveData
 import com.mvvm_kotlin_retrofit.ui.main.view.MainActivity
 import com.mvvm_kotlin_retrofit.utils.Resource
 import io.realm.Realm
-
 import kotlinx.coroutines.Dispatchers
 
 
@@ -19,6 +18,7 @@ class MainViewModel(private val mainRepository: MainRepository, val mContext: Ma
 ) : ViewModel() {
     var languageResponse= MutableLiveData<LanguageListResponse>()
     var apiresponse= LanguageListResponse()
+    lateinit var list: LiveData<List<Data>>
 
     fun getLanguageList(s: String) = liveData(Dispatchers.IO) {
         emit(Resource.loading(data = null))
@@ -68,5 +68,17 @@ class MainViewModel(private val mainRepository: MainRepository, val mContext: Ma
             Log.d("status", "failed")
         }
 
+    }
+
+
+    fun fetchDataFromDB(){
+        val mRealm = Realm.getDefaultInstance()
+        val mRealmLiveData = mRealm.where(Data::class.java).findAllAsync().asLiveData()
+        list = Transformations.map(mRealmLiveData) {
+            realmResult ->
+            mRealm.copyFromRealm(realmResult)
+
+        }
+        Log.d("status---->>>>", list.toString())
     }
 }

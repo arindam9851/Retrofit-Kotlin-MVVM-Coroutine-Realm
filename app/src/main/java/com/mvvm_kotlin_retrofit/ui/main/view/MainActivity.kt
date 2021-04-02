@@ -2,6 +2,7 @@ package com.mvvm_kotlin_retrofit.ui.main.view
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.lifecycle.Observer
@@ -16,6 +17,7 @@ import com.mvvm_kotlin_retrofit.data.model.LanguageListResponse
 import com.mvvm_kotlin_retrofit.ui.base.ViewModelFactory
 import com.mvvm_kotlin_retrofit.ui.main.adapter.MainAdapter
 import com.mvvm_kotlin_retrofit.ui.main.viewmodel.MainViewModel
+import com.mvvm_kotlin_retrofit.utils.AppUtils
 import com.mvvm_kotlin_retrofit.utils.Status
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -28,7 +30,16 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         setupUI()
         setupViewModel()
-        setupObservers()
+        if( AppUtils.isNetworkConnected(this))
+            setupObservers()
+        else
+        {
+            viewModel.fetchDataFromDB()
+            viewModel.list.observe(this, Observer {
+                retrieveList(viewModel.list.value!!)
+            })
+        }
+
     }
 
     private fun setupViewModel() {
